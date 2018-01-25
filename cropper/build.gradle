@@ -1,6 +1,7 @@
 apply plugin: 'android-library'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'com.github.dcendents.android-maven'
 
 version = "2.0.0"
 group = "com.edmodo"
@@ -26,6 +27,7 @@ android {
 
 dependencies {
     compile 'com.android.support:support-annotations:25.3.1'
+//    compile 'com.github.dcendents.android-maven'
 }
 
 repositories {
