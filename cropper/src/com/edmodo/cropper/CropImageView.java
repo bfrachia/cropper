@@ -28,7 +28,6 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
@@ -43,9 +42,10 @@ import com.edmodo.cropper.util.PaintUtil;
  */
 public class CropImageView extends ImageView {
 
+    private boolean setUp;
 
-    static float heartWidth = 24;
-    static float hearthHeight = 24;
+    static float heartWidth = 0;
+    static float hearthHeight = 0;
 
     static float horizontalOffset = 0;
     static float verticalOffset = 0;
@@ -55,8 +55,7 @@ public class CropImageView extends ImageView {
     static float lastTop = 0;
     static float lastBottom = 0;
 
-    public Path path;
-    private float currentScale = 1;
+    private Path path;
 
     // Private Constants ///////////////////////////////////////////////////////////////////////////
 
@@ -405,7 +404,12 @@ public class CropImageView extends ImageView {
     }
 
     private void drawDarkenedSurroundingArea(@NonNull Canvas canvas) {
-
+        if (heartWidth == 0 && hearthHeight == 0) {
+            RectF rectF = new RectF();
+            path.computeBounds(rectF, true);
+            heartWidth = rectF.width();
+            hearthHeight = rectF.height();
+        }
         final RectF bitmapRect = mBitmapRect;
 
         final float left = Edge.LEFT.getCoordinate();
@@ -500,10 +504,32 @@ public class CropImageView extends ImageView {
             lastTop = top;
             lastBottom = bottom;
         }
-//        else {
-//
-//            if (left != lastLeft && right != lastRight && top != lastTop && bottom != lastBottom)
-//        }
+        else if (!setUp){
+            setUp = true;
+            Matrix scaleMatrix = new Matrix();
+            RectF rectF = new RectF();
+            path.computeBounds(rectF, true);
+
+            float widthScale = (right - left) / heartWidth;
+            float heightScale = (bottom - top) / hearthHeight;
+
+            float scale = Math.max(widthScale, heightScale);
+
+            heartWidth = heartWidth * heightScale;
+            hearthHeight = hearthHeight * heightScale;
+
+            scaleMatrix.setScale(heightScale, heightScale, scaleCenterX, scaleCenterY);
+            path.transform(scaleMatrix);
+
+            horizontalOffset = left - lastLeft;
+            verticalOffset = top - lastTop;
+            path.offset(horizontalOffset, verticalOffset);
+
+            lastLeft = left;
+            lastRight = right;
+            lastTop = top;
+            lastBottom = bottom;
+        }
 
         canvas.drawPath(path, mSurroundingAreaOverlayPaint);
     }
@@ -646,4 +672,8 @@ public class CropImageView extends ImageView {
         invalidate();
     }
 
+    public void setPath(Path path) {
+        this.path = path;
+        this.path.setFillType(Path.FillType.INVERSE_EVEN_ODD);
+    }
 }
