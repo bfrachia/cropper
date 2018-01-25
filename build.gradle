@@ -2,6 +2,7 @@ buildscript {
 
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         // Plug-in release notes: http://tools.android.com/tech-docs/new-build-system
