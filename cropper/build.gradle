@@ -2,9 +2,6 @@ apply plugin: 'android-library'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-version = "2.0.0"
-group = "com.edmodo"
-
 android {
 
     compileSdkVersion 25
@@ -35,11 +32,4 @@ repositories {
 signing {
     required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
-}
-
-task publishLocal(type: Upload) {
-    configuration = configurations.archives
-    repositories.mavenDeployer {
-        repository(url: "file://$buildDir/repo")
-    }
 }
