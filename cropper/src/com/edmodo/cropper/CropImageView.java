@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -40,6 +41,21 @@ import com.edmodo.cropper.util.PaintUtil;
  * Custom view that provides cropping capabilities to an image.
  */
 public class CropImageView extends ImageView {
+
+    private boolean setUp;
+
+    static float heartWidth = 0;
+    static float hearthHeight = 0;
+
+    static float horizontalOffset = 0;
+    static float verticalOffset = 0;
+
+    static float lastLeft = 0;
+    static float lastRight = 0;
+    static float lastTop = 0;
+    static float lastBottom = 0;
+
+    private Path path;
 
     // Private Constants ///////////////////////////////////////////////////////////////////////////
 
@@ -388,7 +404,12 @@ public class CropImageView extends ImageView {
     }
 
     private void drawDarkenedSurroundingArea(@NonNull Canvas canvas) {
-
+        if (heartWidth == 0 && hearthHeight == 0) {
+            RectF rectF = new RectF();
+            path.computeBounds(rectF, true);
+            heartWidth = rectF.width();
+            hearthHeight = rectF.height();
+        }
         final RectF bitmapRect = mBitmapRect;
 
         final float left = Edge.LEFT.getCoordinate();
@@ -415,6 +436,102 @@ public class CropImageView extends ImageView {
         canvas.drawRect(bitmapRect.left, bottom, bitmapRect.right, bitmapRect.bottom, mSurroundingAreaOverlayPaint);
         canvas.drawRect(bitmapRect.left, top, left, bottom, mSurroundingAreaOverlayPaint);
         canvas.drawRect(right, top, bitmapRect.right, bottom, mSurroundingAreaOverlayPaint);
+
+
+        float scaleCenterX = 0;
+        float scaleCenterY = 0;
+        if (mPressedHandle != null) {
+
+            if (mPressedHandle != Handle.CENTER) {
+                switch (mPressedHandle) {
+                    case TOP_LEFT:
+                        scaleCenterX = right;
+                        scaleCenterY = bottom;
+                        break;
+                    case TOP:
+                        scaleCenterX = (right + left) / 2;
+                        scaleCenterY = bottom;
+                        break;
+                    case TOP_RIGHT:
+                        scaleCenterX = left;
+                        scaleCenterY = bottom;
+                        break;
+                    case RIGHT:
+                        scaleCenterX = left;
+                        scaleCenterY = (top + bottom) / 2;
+                        break;
+                    case BOTTOM_RIGHT:
+                        scaleCenterX = left;
+                        scaleCenterY = top;
+                        break;
+                    case BOTTOM:
+                        scaleCenterX = (right + left) / 2;
+                        scaleCenterY = top;
+                        break;
+                    case BOTTOM_LEFT:
+                        scaleCenterX = right;
+                        scaleCenterY = top;
+                        break;
+                    case LEFT:
+                        scaleCenterX = right;
+                        scaleCenterY = (top + bottom) / 2;
+                        break;
+                }
+
+                Matrix scaleMatrix = new Matrix();
+                RectF rectF = new RectF();
+                path.computeBounds(rectF, true);
+
+                float widthScale = (right - left) / heartWidth;
+                float heightScale = (bottom - top) / hearthHeight;
+
+                float scale = Math.max(widthScale, heightScale);
+
+                heartWidth = heartWidth * heightScale;
+                hearthHeight = hearthHeight * heightScale;
+
+                scaleMatrix.setScale(heightScale, heightScale, scaleCenterX, scaleCenterY);
+                path.transform(scaleMatrix);
+            }
+            else {
+                horizontalOffset = left - lastLeft;
+                verticalOffset = top - lastTop;
+                path.offset(horizontalOffset, verticalOffset);
+            }
+
+            lastLeft = left;
+            lastRight = right;
+            lastTop = top;
+            lastBottom = bottom;
+        }
+        else if (!setUp){
+            setUp = true;
+            Matrix scaleMatrix = new Matrix();
+            RectF rectF = new RectF();
+            path.computeBounds(rectF, true);
+
+            float widthScale = (right - left) / heartWidth;
+            float heightScale = (bottom - top) / hearthHeight;
+
+            float scale = Math.max(widthScale, heightScale);
+
+            heartWidth = heartWidth * heightScale;
+            hearthHeight = hearthHeight * heightScale;
+
+            scaleMatrix.setScale(heightScale, heightScale, scaleCenterX, scaleCenterY);
+            path.transform(scaleMatrix);
+
+            horizontalOffset = left - lastLeft;
+            verticalOffset = top - lastTop;
+            path.offset(horizontalOffset, verticalOffset);
+
+            lastLeft = left;
+            lastRight = right;
+            lastTop = top;
+            lastBottom = bottom;
+        }
+
+        canvas.drawPath(path, mSurroundingAreaOverlayPaint);
     }
 
     private void drawGuidelines(@NonNull Canvas canvas) {
@@ -555,4 +672,8 @@ public class CropImageView extends ImageView {
         invalidate();
     }
 
+    public void setPath(Path path) {
+        this.path = path;
+        this.path.setFillType(Path.FillType.INVERSE_EVEN_ODD);
+    }
 }

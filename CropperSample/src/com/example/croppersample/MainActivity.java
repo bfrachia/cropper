@@ -3,6 +3,7 @@ package com.example.croppersample;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -126,5 +127,11 @@ public class MainActivity extends Activity {
                 croppedImageView.setImageBitmap(croppedImage);
             }
         });
+
+        Path path = PathParser
+                .createPathFromPathData("M862.8,257.3C862.8,115.2 747.6,0 605.5,0c-67.2,0 -128.3,25.8 -174.1,67.9C385.6,25.8 324.4,0 257.3,0C115.2,0 0,115.2 0,257.3c0,2.5 0.1,4.9 0.2,7.4c-1.1,21.7 0.8,90.4 52.8,197.2c51,105 147,212 319.5,350.5c0.4,0.3 29.9,20.9 59.4,20.9c29.5,0 59,-20.6 59.4,-20.9c172.4,-138.4 268.4,-245.5 319.5,-350.5C874.4,330.9 862.8,257.3 862.8,257.3z");
+
+        cropImageView.setPath(path);
+
     }
 }

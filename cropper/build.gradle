@@ -7,12 +7,12 @@ group = "com.edmodo"
 
 android {
 
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
-        minSdkVersion 7
-        targetSdkVersion 23
+        minSdkVersion 9
+        targetSdkVersion 25
     }
 
     sourceSets {
@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:23.1.0'
+    compile 'com.android.support:support-annotations:25.3.1'
 }
 
 repositories {
@@ -41,50 +41,5 @@ task publishLocal(type: Upload) {
     configuration = configurations.archives
     repositories.mavenDeployer {
         repository(url: "file://$buildDir/repo")
-    }
-}
-
-uploadArchives {
-    repositories.mavenDeployer {
-        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-        repository(url: sonatypeRepo) {
-            authentication(userName: sonatypeUsername,
-                    password: sonatypePassword)
-        }
-
-        pom.project {
-            name 'Cropper'
-            packaging 'aar'
-            description 'Image cropper library for Android applications'
-            url 'https://github.com/edmodo/cropper'
-
-            scm {
-                url 'scm:git@github.com:edmodo/cropper.git'
-                connection 'scm:git@github.com:edmodo/cropper.git'
-                developerConnection 'scm:git@github.com:edmodo/cropper.git'
-            }
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-
-            developers {
-                developer {
-                    id 'ahuang13'
-                    name 'Angus Huang'
-                    email 'angus@edmodo.com'
-                }
-                developer {
-                    id 'TT1943'
-                    name 'Xiahong Lin'
-                    email 'xiahong@edmodo.com'
-                }
-            }
-        }
     }
 }

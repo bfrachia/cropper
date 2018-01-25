@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:id="@+id/scrollview"
+<ScrollView android:id="@+id/scrollview"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,6 +29,7 @@
             android:layout_marginTop="@dimen/content_padding"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
+            app:fixAspectRatio="true"
             android:src="@drawable/butterfly"/>
 
         <LinearLayout
